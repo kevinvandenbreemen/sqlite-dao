@@ -37,4 +37,15 @@ class SQLiteDAOTest {
         assertEquals(1, records.size());
         assertEquals("Test", records.get(0).get("name"));
     }
+
+    @Test
+    public void shouldUpdateRecord() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local3"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string)");
+        dao.insert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
+        dao.update("person", new String[]{ "name" }, new Object[]{ "Kevin" }, "id", 1);
+        List<Map<String, Object>> records = dao.query("person", new String[]{ "name" }, "id", 1);
+        assertEquals(1, records.size());
+        assertEquals("Kevin", records.get(0).get("name"));
+    }
 }

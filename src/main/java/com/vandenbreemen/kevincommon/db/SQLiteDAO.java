@@ -87,4 +87,34 @@ public class SQLiteDAO {
         }
         return Collections.emptyList();
     }
+
+    public void update(String tableName, String[] columns, Object[] newValues, String whereColumn, Object equalsValue) {
+        StringBuilder prepared = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
+
+        for(int i=0; i<columns.length; i++) {
+            prepared.append(columns[i]).append(" = ?");
+            if(i < columns.length-1) {
+                prepared.append(", ");
+            }
+        }
+        prepared.append(" WHERE ").append(whereColumn).append(" = ?");
+
+
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(prepared.toString());) {
+
+            int index = 1;
+            for(Object v : newValues) {
+                setValueAtStatementIndex(statement, index, v);
+                index++;
+            }
+
+            setValueAtStatementIndex(statement, index, equalsValue);
+
+            statement.executeUpdate();
+
+        } catch (Exception ex) {
+            logger.error("Could not perform insert\n"+prepared, ex);
+        }
+
+    }
 }
