@@ -56,4 +56,16 @@ class SQLiteDAOTest {
         List<Map<String, Object>> rec = dao.query("SELECT * from p where id=?", new Object[]{1});
         assertEquals(0, rec.size());
     }
+
+    @Test
+    public void shouldModifyMultipleColumns() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local4"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string, lastname string)");
+        dao.performSimpleInsert("person", new String[]{"id", "name", "lastname"}, new Object[]{1, "Kevin", "tester"});
+        dao.update("person", new String[]{"name", "lastname"}, new Object[]{"first", "last"}, "id", 1);
+        List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{"name", "lastname"}, "id", 1);
+        assertEquals(1, records.size());
+        assertEquals("first", records.get(0).get("name"));
+        assertEquals("last", records.get(0).get("lastname"));
+    }
 }
