@@ -31,8 +31,8 @@ class SQLiteDAOTest {
     public void shouldInsertRecordIntoTable() {
         SQLiteDAO dao = new SQLiteDAO("databases/local2"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string)");
-        dao.insert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
-        List<Map<String, Object>> records = dao.query("person", new String[]{ "name" }, "id", 1);
+        dao.performSimpleInsert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
+        List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{ "name" }, "id", 1);
         assertEquals(1, records.size());
         assertEquals("Test", records.get(0).get("name"));
     }
@@ -41,10 +41,19 @@ class SQLiteDAOTest {
     public void shouldUpdateRecord() {
         SQLiteDAO dao = new SQLiteDAO("databases/local3"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string)");
-        dao.insert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
+        dao.performSimpleInsert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
         dao.update("person", new String[]{ "name" }, new Object[]{ "Kevin" }, "id", 1);
-        List<Map<String, Object>> records = dao.query("person", new String[]{ "name" }, "id", 1);
+        List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{ "name" }, "id", 1);
         assertEquals(1, records.size());
         assertEquals("Kevin", records.get(0).get("name"));
+    }
+
+    @Test
+    public void shouldGracefullyHandleErrorQuerying() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local3"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string, lastname string)");
+        dao.insert("insert into person (id, name, lastname) values (?, ?, ?)", new Object[]{ 1, "Kevin", "Tester"});
+        List<Map<String, Object>> rec = dao.query("SELECT * from p where id=?", new Object[]{1});
+        assertEquals(0, rec.size());
     }
 }

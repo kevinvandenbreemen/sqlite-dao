@@ -24,7 +24,7 @@ public class SQLiteDAO {
         }
     }
 
-    public void executeInsert(String sql, Object[] values) {
+    public void insert(String sql, Object[] values) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
 
             int index = 1;
@@ -40,7 +40,7 @@ public class SQLiteDAO {
         }
     }
 
-    public void insert(String tableName, String[] columnNames, Object[] values) {
+    public void performSimpleInsert(String tableName, String[] columnNames, Object[] values) {
 
         StringBuilder prepared = new StringBuilder("INSERT INTO ").append(tableName).append(" ( ").append(String.join(", ", columnNames)).append(")");
 
@@ -53,7 +53,7 @@ public class SQLiteDAO {
         }
         prepared.append(")");
 
-        executeInsert(prepared.toString(), values);
+        insert(prepared.toString(), values);
     }
 
     private void setValueAtStatementIndex(PreparedStatement statement, int index, Object v) throws SQLException {
@@ -95,7 +95,7 @@ public class SQLiteDAO {
         return Collections.emptyList();
     }
 
-    public List<Map<String, Object>> query(String tableName, String[] columns, String columnName, Object value) {
+    public List<Map<String, Object>> performSimpleQuery(String tableName, String[] columns, String columnName, Object value) {
 
         StringBuilder prepared = new StringBuilder("SELECT ").append(String.join(", ", columns)).append(" FROM ").append(tableName).append(" WHERE ").append(columnName).append(" = ?");
 
