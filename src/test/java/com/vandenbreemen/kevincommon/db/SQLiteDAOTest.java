@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,8 +23,18 @@ class SQLiteDAOTest {
 
     @Test
     public void shouldCreateTable() {
-        SQLiteDAO dao = new SQLiteDAO("databases/local1");
+        SQLiteDAO dao = new SQLiteDAO("databases/local1"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string)");
 
+    }
+
+    @Test
+    public void shouldInsertRecordIntoTable() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local2"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string)");
+        dao.insert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
+        List<Map<String, Object>> records = dao.query("person", new String[]{ "name" }, "id", 1);
+        assertEquals(1, records.size());
+        assertEquals("Test", records.get(0).get("name"));
     }
 }
