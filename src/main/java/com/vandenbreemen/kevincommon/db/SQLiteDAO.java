@@ -102,7 +102,7 @@ public class SQLiteDAO {
         return query(prepared.toString(), new Object[]{value});
     }
 
-    public void update(String tableName, String[] columns, Object[] newValues, String whereColumn, Object equalsValue) {
+    public void performSimpleUpdate(String tableName, String[] columns, Object[] newValues, String whereColumn, Object equalsValue) {
         StringBuilder prepared = new StringBuilder("UPDATE ").append(tableName).append(" SET ");
 
         for(int i=0; i<columns.length; i++) {

@@ -42,7 +42,7 @@ class SQLiteDAOTest {
         SQLiteDAO dao = new SQLiteDAO("databases/local3"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string)");
         dao.performSimpleInsert("person", new String[]{ "id", "name" }, new Object[]{1, "Test"});
-        dao.update("person", new String[]{ "name" }, new Object[]{ "Kevin" }, "id", 1);
+        dao.performSimpleUpdate("person", new String[]{ "name" }, new Object[]{ "Kevin" }, "id", 1);
         List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{ "name" }, "id", 1);
         assertEquals(1, records.size());
         assertEquals("Kevin", records.get(0).get("name"));
@@ -62,7 +62,7 @@ class SQLiteDAOTest {
         SQLiteDAO dao = new SQLiteDAO("databases/local4"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string, lastname string)");
         dao.performSimpleInsert("person", new String[]{"id", "name", "lastname"}, new Object[]{1, "Kevin", "tester"});
-        dao.update("person", new String[]{"name", "lastname"}, new Object[]{"first", "last"}, "id", 1);
+        dao.performSimpleUpdate("person", new String[]{"name", "lastname"}, new Object[]{"first", "last"}, "id", 1);
         List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{"name", "lastname"}, "id", 1);
         assertEquals(1, records.size());
         assertEquals("first", records.get(0).get("name"));
