@@ -114,21 +114,26 @@ public class SQLiteDAO {
         prepared.append(" WHERE ").append(whereColumn).append(" = ?");
 
 
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(prepared.toString());) {
+        Object[] paramsAndValues = new Object[newValues.length+1];
+        System.arraycopy(newValues, 0, paramsAndValues, 0, newValues.length);
+        paramsAndValues[newValues.length] = equalsValue;
+        update(prepared.toString(), paramsAndValues);
+
+    }
+
+    public void update(String sql, Object[] paramsAndValues) {
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
 
             int index = 1;
-            for(Object v : newValues) {
+            for(Object v : paramsAndValues) {
                 setValueAtStatementIndex(statement, index, v);
                 index++;
             }
 
-            setValueAtStatementIndex(statement, index, equalsValue);
-
             statement.executeUpdate();
 
         } catch (Exception ex) {
-            logger.error("Could not perform insert\n"+prepared, ex);
+            logger.error("Could not perform insert\n"+sql, ex);
         }
-
     }
 }
