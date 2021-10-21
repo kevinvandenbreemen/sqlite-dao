@@ -32,22 +32,27 @@ public class SQLiteDAO {
     }
 
     public void insert(String sql, Object[] values) {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
-
+        try {
             access.acquire();
-            int index = 1;
-            for(Object v : values) {
-                setValueAtStatementIndex(statement, index, v);
-                index++;
+            try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+                int index = 1;
+                for(Object v : values) {
+                    setValueAtStatementIndex(statement, index, v);
+                    index++;
+                }
+
+                statement.executeUpdate();
+
+            } catch (Exception ex) {
+                logger.error("Could not perform insert\n"+sql, ex);
             }
-
-            statement.executeUpdate();
-
-        } catch (Exception ex) {
-            logger.error("Could not perform insert\n"+sql, ex);
-        } finally {
+        } catch (InterruptedException inter) {
+            logger.error("Failed to acquire database lock", inter);
+        }
+        finally {
             access.release();
         }
+
     }
 
     public void performSimpleInsert(String tableName, String[] columnNames, Object[] values) {
@@ -76,34 +81,39 @@ public class SQLiteDAO {
     }
 
     public List<Map<String, Object>> query(String sql, Object[] values) {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
 
+        try {
             access.acquire();
 
-            int index = 1;
-            for(Object v : values) {
-                setValueAtStatementIndex(statement, index, v);
-                index++;
-            }
-            ResultSet rs = statement.executeQuery();
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
 
-            String[] columnsToFetch = new String[rs.getMetaData().getColumnCount()];
-            for(int i=0; i<columnsToFetch.length; i++) {
-                columnsToFetch[i] = rs.getMetaData().getColumnName(i+1);
-            }
-
-            ArrayList<Map<String, Object>> result = new ArrayList<>();
-            while(rs.next()) {
-                Map<String, Object> row = new HashMap<>();
-                for(String column : columnsToFetch) {
-                    row.put(column, rs.getObject(column));
+                int index = 1;
+                for (Object v : values) {
+                    setValueAtStatementIndex(statement, index, v);
+                    index++;
                 }
-                result.add(row);
-            }
+                ResultSet rs = statement.executeQuery();
 
-            return result;
-        }catch (Exception ex) {
-            logger.error("Could not perform query\n"+sql, ex);
+                String[] columnsToFetch = new String[rs.getMetaData().getColumnCount()];
+                for (int i = 0; i < columnsToFetch.length; i++) {
+                    columnsToFetch[i] = rs.getMetaData().getColumnName(i + 1);
+                }
+
+                ArrayList<Map<String, Object>> result = new ArrayList<>();
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    for (String column : columnsToFetch) {
+                        row.put(column, rs.getObject(column));
+                    }
+                    result.add(row);
+                }
+
+                return result;
+            } catch (Exception ex) {
+                logger.error("Could not perform query\n" + sql, ex);
+            }
+        } catch (InterruptedException interruptedException) {
+            logger.error("Failed to acquire database lock", interruptedException);
         } finally {
             access.release();
         }
@@ -146,18 +156,22 @@ public class SQLiteDAO {
     }
 
     public void update(String sql, Object[] paramsAndValues) {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+        try {
             access.acquire();
-            int index = 1;
-            for(Object v : paramsAndValues) {
-                setValueAtStatementIndex(statement, index, v);
-                index++;
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+                int index = 1;
+                for (Object v : paramsAndValues) {
+                    setValueAtStatementIndex(statement, index, v);
+                    index++;
+                }
+
+                statement.executeUpdate();
+
+            } catch (Exception ex) {
+                logger.error("Could not perform insert\n" + sql, ex);
             }
-
-            statement.executeUpdate();
-
-        } catch (Exception ex) {
-            logger.error("Could not perform insert\n"+sql, ex);
+        } catch (InterruptedException interruptedException) {
+            logger.error("Failed to acquire database lock", interruptedException);
         } finally {
             access.release();
         }
