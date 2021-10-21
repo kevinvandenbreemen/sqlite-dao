@@ -5,8 +5,8 @@ plugins {
     `java-library`
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "com.vandenbreemen"
+version = "1.0.0.0000"
 
 repositories {
     mavenCentral()
