@@ -68,4 +68,14 @@ class SQLiteDAOTest {
         assertEquals("first", records.get(0).get("name"));
         assertEquals("last", records.get(0).get("lastname"));
     }
+
+    @Test
+    public void shouldDoDelete() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local4"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string, lastname string)");
+        dao.performSimpleInsert("person", new String[]{"id", "name", "lastname"}, new Object[]{1, "Kevin", "tester"});
+        dao.delete("DELETE FROM person WHERE id=?", new Object[]{1});
+        List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{"name", "lastname"}, "id", 1);
+        assertEquals(0, records.size());
+    }
 }

@@ -136,6 +136,15 @@ public class SQLiteDAO {
 
     }
 
+    /**
+     * This method is just another update but is provided in order to allow for code that is easier to read
+     * @param sql
+     * @param paramsAndValues
+     */
+    public void delete(String sql, Object[] paramsAndValues) {
+        update(sql, paramsAndValues);
+    }
+
     public void update(String sql, Object[] paramsAndValues) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
             access.acquire();
