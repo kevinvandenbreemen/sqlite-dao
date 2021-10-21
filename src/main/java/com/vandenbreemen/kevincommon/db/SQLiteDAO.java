@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class SQLiteDAO {
 
@@ -11,8 +12,14 @@ public class SQLiteDAO {
 
     private String filePath;
 
+    /**
+     * Single-threaded access for now in order to side-step any issues with how the file system will handle concurrent reads/writes
+     */
+    private Semaphore access;
+
     public SQLiteDAO(String filePath) {
         this.filePath = filePath;
+        access = new Semaphore(1);
     }
 
     public void createTable(String createSQL) {
@@ -27,6 +34,7 @@ public class SQLiteDAO {
     public void insert(String sql, Object[] values) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
 
+            access.acquire();
             int index = 1;
             for(Object v : values) {
                 setValueAtStatementIndex(statement, index, v);
@@ -37,6 +45,8 @@ public class SQLiteDAO {
 
         } catch (Exception ex) {
             logger.error("Could not perform insert\n"+sql, ex);
+        } finally {
+            access.release();
         }
     }
 
@@ -67,6 +77,9 @@ public class SQLiteDAO {
 
     public List<Map<String, Object>> query(String sql, Object[] values) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+
+            access.acquire();
+
             int index = 1;
             for(Object v : values) {
                 setValueAtStatementIndex(statement, index, v);
@@ -91,6 +104,8 @@ public class SQLiteDAO {
             return result;
         }catch (Exception ex) {
             logger.error("Could not perform query\n"+sql, ex);
+        } finally {
+            access.release();
         }
         return Collections.emptyList();
     }
@@ -123,7 +138,7 @@ public class SQLiteDAO {
 
     public void update(String sql, Object[] paramsAndValues) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
-
+            access.acquire();
             int index = 1;
             for(Object v : paramsAndValues) {
                 setValueAtStatementIndex(statement, index, v);
@@ -134,6 +149,8 @@ public class SQLiteDAO {
 
         } catch (Exception ex) {
             logger.error("Could not perform insert\n"+sql, ex);
+        } finally {
+            access.release();
         }
     }
 }
