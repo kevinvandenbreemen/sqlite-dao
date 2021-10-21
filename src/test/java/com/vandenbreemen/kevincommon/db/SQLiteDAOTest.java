@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SQLiteDAOTest {
 
@@ -24,6 +24,15 @@ class SQLiteDAOTest {
     public void shouldCreateTable() {
         SQLiteDAO dao = new SQLiteDAO("databases/local1"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string)");
+
+    }
+
+    @Test
+    public void shouldCheckIfTableExists() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local10"+System.currentTimeMillis());
+        assertFalse(dao.tableExists("person"));
+        dao.createTable("create table person (id integer, name string)");
+        assertTrue(dao.tableExists("person"));
 
     }
 

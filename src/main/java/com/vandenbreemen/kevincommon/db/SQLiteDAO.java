@@ -176,4 +176,8 @@ public class SQLiteDAO {
             access.release();
         }
     }
+
+    public boolean tableExists(String tableName) {
+        return query("SELECT name FROM sqlite_master WHERE type='table' AND name=?", new Object[]{tableName}).size() > 0;
+    }
 }
