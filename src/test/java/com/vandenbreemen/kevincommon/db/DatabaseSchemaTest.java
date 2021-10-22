@@ -54,4 +54,12 @@ class DatabaseSchemaTest {
         System.out.println(dao.query("SELECT * FROM page", new Object[]{}));
     }
 
+    @Test
+    public void shouldNotIncrementVersionOnChangeFailure() {
+        SQLiteDAO dao = new SQLiteDAO(file.getAbsolutePath());
+        DatabaseSchema schema = new DatabaseSchema(dao);
+        schema.addDatabaseChange(1, "CREATE TABLE fasdf WITH");
+        assertEquals(0, schema.getVersionNumber());
+    }
+
 }

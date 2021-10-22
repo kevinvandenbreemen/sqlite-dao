@@ -22,12 +22,14 @@ public class SQLiteDAO {
         access = new Semaphore(1);
     }
 
-    public void createTable(String createSQL) {
+    public boolean createTable(String createSQL) {
         try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
             Statement statement = connection.createStatement();
             statement.executeUpdate(createSQL);
+            return true;
         } catch (Exception ex) {
             logger.error("Could not create table", ex);
+            return false;
         }
     }
 

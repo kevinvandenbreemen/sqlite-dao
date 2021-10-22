@@ -49,7 +49,9 @@ public class DatabaseSchema {
         logger.debug("Applying change\n\n=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n"+changeSQL+
                 "\n=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n\n");
 
-        dao.createTable(changeSQL);
+        if(!dao.createTable(changeSQL)){
+            return false;
+        }
         setVersionNumber(version);
         return true;
     }
