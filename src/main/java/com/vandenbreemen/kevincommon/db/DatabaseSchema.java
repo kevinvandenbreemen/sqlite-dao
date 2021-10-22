@@ -1,5 +1,7 @@
 package com.vandenbreemen.kevincommon.db;
 
+import org.apache.log4j.Logger;
+
 public class DatabaseSchema {
 
     private static final String METADATA_TABLE_NAME = "_metadata";
@@ -8,6 +10,8 @@ public class DatabaseSchema {
      * DAO
      */
     private SQLiteDAO dao;
+
+    private static final Logger logger = Logger.getLogger(DatabaseSchema.class);
 
     public DatabaseSchema(SQLiteDAO dao) {
         this.dao = dao;
@@ -41,6 +45,10 @@ public class DatabaseSchema {
         if(getVersionNumber() >= version) {
             return false;
         }
+
+        logger.debug("Applying change\n\n=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n"+changeSQL+
+                "\n=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/=/\n\n");
+
         dao.createTable(changeSQL);
         setVersionNumber(version);
         return true;
