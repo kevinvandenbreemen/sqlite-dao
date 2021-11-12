@@ -1,6 +1,7 @@
 package com.vandenbreemen.kevincommon.db;
 
 import org.apache.log4j.Logger;
+import org.sqlite.SQLiteConfig;
 
 import java.sql.*;
 import java.util.*;
@@ -22,8 +23,14 @@ public class SQLiteDAO {
         access = new Semaphore(1);
     }
 
+    private SQLiteConfig getNewCnctConfig() {
+        SQLiteConfig config = new SQLiteConfig();
+        config.enforceForeignKeys(true);
+        return config;
+    }
+
     public boolean createTable(String createSQL) {
-        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
+        try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath, getNewCnctConfig().toProperties())) {
             Statement statement = connection.createStatement();
             statement.executeUpdate(createSQL);
             return true;
@@ -36,7 +43,7 @@ public class SQLiteDAO {
     public void insert(String sql, Object[] values) {
         try {
             access.acquire();
-            try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+            try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath, getNewCnctConfig().toProperties()); PreparedStatement statement = connection.prepareStatement(sql);) {
                 int index = 1;
                 for(Object v : values) {
                     setValueAtStatementIndex(statement, index, v);
@@ -87,7 +94,7 @@ public class SQLiteDAO {
         try {
             access.acquire();
 
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath, getNewCnctConfig().toProperties()); PreparedStatement statement = connection.prepareStatement(sql);) {
 
                 int index = 1;
                 for (Object v : values) {
@@ -160,7 +167,7 @@ public class SQLiteDAO {
     public void update(String sql, Object[] paramsAndValues) {
         try {
             access.acquire();
-            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath); PreparedStatement statement = connection.prepareStatement(sql);) {
+            try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath, getNewCnctConfig().toProperties()); PreparedStatement statement = connection.prepareStatement(sql);) {
                 int index = 1;
                 for (Object v : paramsAndValues) {
                     setValueAtStatementIndex(statement, index, v);

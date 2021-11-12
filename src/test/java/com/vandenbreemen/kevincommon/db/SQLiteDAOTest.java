@@ -87,4 +87,16 @@ class SQLiteDAOTest {
         List<Map<String, Object>> records = dao.performSimpleQuery("person", new String[]{"name", "lastname"}, "id", 1);
         assertEquals(0, records.size());
     }
+
+    @Test
+    public void shouldEnforceForeignKeys() {
+        SQLiteDAO dao = new SQLiteDAO("databases/local6"+System.currentTimeMillis());
+        dao.createTable("create table person (id integer, name string, lastname string)");
+        dao.createTable("CREATE TABLE person_addr(person_id integer, name string, constraint fk_person FOREIGN KEY (person_id) REFERENCES person(id) ON DELETE CASCADE)");
+        dao.insert("INSERT INTO person(id, name) VALUES (?, ?)", new Object[]{1, "Kevin"});
+        dao.insert("INSERT INTO person_addr(person_id, name) VALUES (?, ?)", new Object[]{1, "Someplace"});
+        dao.delete("DELETE FROM person WHERE id=?", new Object[]{1});
+        List<Map<String, Object>> records = dao.query("SELECT * from person_addr", new Object[0]);
+        assertTrue(records.isEmpty());
+    }
 }
