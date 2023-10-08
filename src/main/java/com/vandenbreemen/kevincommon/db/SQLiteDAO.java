@@ -122,6 +122,9 @@ public class SQLiteDAO {
                 }
 
                 return result;
+            } catch (SQLiteException sqx) {
+                logger.error("SQL error occurred\n"+sql, sqx);
+                throw new RuntimeException("Query could not be executed", sqx);
             } catch (Exception ex) {
                 logger.error("Could not perform query\n" + sql, ex);
             }

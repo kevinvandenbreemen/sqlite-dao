@@ -58,12 +58,16 @@ class SQLiteDAOTest {
     }
 
     @Test
-    public void shouldGracefullyHandleErrorQuerying() {
+    public void shouldRaiseAnErrorWhenHandlingBadlyFormedQuery() {
         SQLiteDAO dao = new SQLiteDAO("databases/local3"+System.currentTimeMillis());
         dao.createTable("create table person (id integer, name string, lastname string)");
         dao.insert("insert into person (id, name, lastname) values (?, ?, ?)", new Object[]{ 1, "Kevin", "Tester"});
-        List<Map<String, Object>> rec = dao.query("SELECT * from p where id=?", new Object[]{1});
-        assertEquals(0, rec.size());
+        try {
+            dao.query("SELECT * from p where id=?", new Object[]{1});
+            fail("Bad table name, should not have worked");
+        } catch (RuntimeException rex) {
+            rex.printStackTrace();
+        }
     }
 
     @Test
