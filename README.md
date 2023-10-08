@@ -24,3 +24,7 @@ program is run without needing to worry about potential conflicts.
 
 # A note about Foreign Keys
 Currently the library has foreign keys enabled by default for SQLite connections.  There is no argument when creating DAOs for disabling this but if you wish you can update the SQLiteDAO class to configure details about the SQLiteConfig object that is generated whenever a new connection is opened.
+
+
+# A note about Exceptions
+This library is written with the assumption that the user will take every step necessary to ensure correct data are passed into the dao.  For example, if you declare a constraint and violate it the library will throw a runtime exception since you reached the last line of defence without sanitizing your input.

@@ -2,6 +2,7 @@ package com.vandenbreemen.kevincommon.db;
 
 import org.apache.log4j.Logger;
 import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteException;
 
 import java.sql.*;
 import java.util.*;
@@ -45,13 +46,16 @@ public class SQLiteDAO {
             access.acquire();
             try(Connection connection = DriverManager.getConnection("jdbc:sqlite:" + filePath, getNewCnctConfig().toProperties()); PreparedStatement statement = connection.prepareStatement(sql);) {
                 int index = 1;
-                for(Object v : values) {
+                for (Object v : values) {
                     setValueAtStatementIndex(statement, index, v);
                     index++;
                 }
 
                 statement.executeUpdate();
 
+            }catch (SQLiteException sqx) {
+                logger.error("SQL error", sqx);
+                throw new RuntimeException("Database update failed", sqx);
             } catch (Exception ex) {
                 logger.error("Could not perform insert\n"+sql, ex);
             }

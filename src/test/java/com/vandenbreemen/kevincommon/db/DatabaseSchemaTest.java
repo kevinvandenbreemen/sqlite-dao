@@ -62,4 +62,24 @@ class DatabaseSchemaTest {
         assertEquals(0, schema.getVersionNumber());
     }
 
+    @Test
+    public void shouldThrowErrorOnBadInsertOrUpdate() {
+        SQLiteDAO dao = new SQLiteDAO(file.getAbsolutePath());
+        DatabaseSchema schema = new DatabaseSchema(dao);
+
+        assertTrue(schema.addDatabaseChange(1, "CREATE TABLE page (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT, age INT)"));
+        assertTrue(schema.addDatabaseChange(2, "ALTER TABLE page ADD chapter TEXT"));
+        assertTrue(schema.addDatabaseChange(3, "CREATE UNIQUE INDEX uc_name ON page(name)"));
+
+        dao.insert("INSERT INTO page(name, age, chapter) VALUES (?, ?, ?)", new Object[]{"page 1", 10, "Chapter 1"});
+
+        try {
+            dao.insert("INSERT INTO page(name, age, chapter) VALUES (?, ?, ?)", new Object[]{"page 1", 12, "Chapter 12"});
+            fail("Violation of constraint should fail");
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+    }
+
 }
