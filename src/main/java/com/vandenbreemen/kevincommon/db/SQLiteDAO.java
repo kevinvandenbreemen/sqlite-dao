@@ -183,6 +183,9 @@ public class SQLiteDAO {
 
                 statement.executeUpdate();
 
+            } catch (SQLiteException sqx) {
+                logger.error("Could not execute update\n"+sql, sqx);
+                throw new RuntimeException("Failed to execute update", sqx);
             } catch (Exception ex) {
                 logger.error("Could not perform insert\n" + sql, ex);
             }
