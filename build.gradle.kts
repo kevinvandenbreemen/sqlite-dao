@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
 
-    val sqlite_version = "3.43.0.0"
+    val sqlite_version = "3.43.2.2"
 
     implementation(kotlin("stdlib"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
