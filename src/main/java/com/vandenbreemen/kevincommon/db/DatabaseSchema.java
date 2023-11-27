@@ -30,7 +30,7 @@ public class DatabaseSchema {
     }
 
 
-    int getVersionNumber() {
+    public int getVersionNumber() {
         setupMetadata();
         return (int)dao.query("SELECT version FROM " + METADATA_TABLE_NAME, new Object[]{}).get(0).get("version");
     }
